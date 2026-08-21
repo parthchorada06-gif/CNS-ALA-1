@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AES Encrypt & Decrypt Tool</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, #243b55, transparent 40%),
+        radial-gradient(circle at bottom right, #3a1c71, transparent 40%),
+        #080b14;
+    color: white;
+    padding: 30px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 38px;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #aeb6c7;
+}
+
+.badges {
+    margin-top: 15px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 8px 15px;
+    margin: 5px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #d7dce7;
+}
+
+/* MAIN GRID */
+
+.operations {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+/* CARD */
+
+.card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.encrypt-card {
+    border-top: 4px solid #667eea;
+}
+
+.decrypt-card {
+    border-top: 4px solid #38ef7d;
+}
+
+.card h2 {
+    margin-bottom: 20px;
+}
+
+.encrypt-title {
+    color: #8ea2ff;
+}
+
+.decrypt-title {
+    color: #38ef7d;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #e5e7eb;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.3);
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 14px 20px;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.encrypt-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.decrypt-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.copy-btn {
+    margin-top: 10px;
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.clear-btn {
+    display: block;
+    margin: 25px auto 0;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #aaa;
+}
+
+.message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    display: none;
+}
+
+.success {
+    display: block;
+    background: rgba(34,197,94,0.12);
+    color: #4ade80;
+}
+
+.error {
+    display: block;
+    background: rgba(239,68,68,0.12);
+    color: #f87171;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #777;
+    font-size: 13px;
+}
+
+/* MOBILE */
+
+@media(max-width: 800px) {
+    .operations {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 28px;
+    }
+
+    body {
+        padding: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+        <h1>🔐 AES Crypto Tool</h1>
+        <p>Secure Text Encryption & Decryption</p>
+
+        <div class="badges">
+            <span class="badge">🛡 AES-256-GCM</span>
+            <span class="badge">🔒 Secure</span>
+            <span class="badge">⚡ Browser Based</span>
+        </div>
+    </div>
+
+
+    <!-- TWO OPERATIONS IN ONE SCREEN -->
+
+    <div class="operations">
+
+        <!-- ================= ENCRYPT ================= -->
+
+        <div class="card encrypt-card">
+
+            <h2 class="encrypt-title">🔒 Encrypt</h2>
+
+            <div class="form-group">
+                <label>📝 Plain Text</label>
+
+                <textarea
+                    id="encryptText"
+                    placeholder="Enter text to encrypt..."
+                ></textarea>
+            </div>
+
+
+            <div class="form-group">
+                <label>🔑 Secret Key</label>
+
+                <input
+                    type="password"
+                    id="encryptKey"
+                    placeholder="Enter secret key"
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label>🔐 Ciphertext</label>
+
+                <textarea
+                    id="cipherText"
+                    placeholder="Encrypted text will appear here..."
+                    readonly
+                ></textarea>
+            </div>
+
+
+            <button
+                class="encrypt-btn"
+                onclick="encryptText()"
+            >
+                🔒 Encrypt Text
+            </button>
+
+
+            <button
+                class="copy-btn"
+                onclick="copyCiphertext()"
+            >
+                📋 Copy Ciphertext
+            </button>
+
+
+            <div id="encryptMessage" class="message"></div>
+
+        </div>
+
+
+    
+
+        <div class="card decrypt-card">
+
+            <h2 class="decrypt-title">🔓 Decrypt</h2>
+
+            <div class="form-group">
+                <label>🔐 Ciphertext</label>
+
+                <textarea
+                    id="decryptCipher"
+                    placeholder="Enter ciphertext to decrypt..."
+                ></textarea>
+            </div>
+
+
+            <div class="form-group">
+                <label>🔑 Secret Key</label>
+
+                <input
+                    type="password"
+                    id="decryptKey"
+                    placeholder="Enter same secret key"
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label>📝 Decrypted Text</label>
+
+                <textarea
+                    id="decryptedText"
+                    placeholder="Decrypted text will appear here..."
+                    readonly
+                ></textarea>
+            </div>
+
+
+            <button
+                class="decrypt-btn"
+                onclick="decryptText()"
+            >
+                🔓 Decrypt Text
+            </button>
+
+
+            <button
+                class="copy-btn"
+                onclick="copyDecrypted()"
+            >
+                📋 Copy Plain Text
+            </button>
+
+
+            <div id="decryptMessage" class="message"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CLEAR -->
+
+    <button
+        class="clear-btn"
+        onclick="clearAll()"
+    >
+        🗑 Clear All
+    </button>
+
+
+    <div class="footer">
+        🔐 Your data is processed locally in your browser.
+        <br>
+        AES-256-GCM • Secure Encryption
+    </div>
+
+</div>
+
+
+<script>
+
+
+async function generateKey(password) {
+
+    const encoder = new TextEncoder();
+
+    const keyMaterial =
+        await crypto.subtle.importKey(
+            "raw",
+            encoder.encode(password),
+            "PBKDF2",
+            false,
+            ["deriveKey"]
+        );
+
+    return crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: encoder.encode("AES-Secure-Salt-2026"),
+            iterations: 100000,
+            hash: "SHA-256"
+        },
+        keyMaterial,
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        false,
+        ["encrypt", "decrypt"]
+    );
+}
+
+
+
+function arrayBufferToBase64(buffer) {
+
+    let binary = "";
+
+    const bytes = new Uint8Array(buffer);
+
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+
+    return btoa(binary);
+}
+
+
+function base64ToArrayBuffer(base64) {
+
+    const binary = atob(base64);
+
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes;
+}
+
+
+
+async function encryptText() {
+
+    const plainText =
+        document.getElementById("encryptText").value.trim();
+
+    const password =
+        document.getElementById("encryptKey").value;
+
+    if (!plainText) {
+
+        showMessage(
+            "encryptMessage",
+            "⚠ Please enter plain text.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (!password) {
+
+        showMessage(
+            "encryptMessage",
+            "⚠ Please enter a secret key.",
+            "error"
+        );
+
+        return;
+    }
+
+    try {
+
+        const encoder = new TextEncoder();
+
+        const key =
+            await generateKey(password);
+
+        /*
+            AES-GCM uses a unique 12-byte IV.
+        */
+
+        const iv =
+            crypto.getRandomValues(
+                new Uint8Array(12)
+            );
+
+        const encrypted =
+            await crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                encoder.encode(plainText)
+            );
+
+        const encryptedBytes =
+            new Uint8Array(encrypted);
+
+
+        /*
+            Store IV + Ciphertext together.
+        */
+
+        const combined =
+            new Uint8Array(
+                iv.length + encryptedBytes.length
+            );
+
+        combined.set(iv, 0);
+
+        combined.set(
+            encryptedBytes,
+            iv.length
+        );
+
+
+        const ciphertext =
+            arrayBufferToBase64(combined);
+
+
+        /*
+            Show ciphertext in both places.
+        */
+
+        document.getElementById(
+            "cipherText"
+        ).value = ciphertext;
+
+        document.getElementById(
+            "decryptCipher"
+        ).value = ciphertext;
+
+
+        showMessage(
+            "encryptMessage",
+            "✓ Encryption completed successfully.",
+            "success"
+        );
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "encryptMessage",
+            "✕ Encryption failed.",
+            "error"
+        );
+    }
+}
+
+
+
+async function decryptText() {
+
+    const ciphertext =
+        document.getElementById("decryptCipher").value.trim();
+
+    const password =
+        document.getElementById("decryptKey").value;
+
+    if (!ciphertext) {
+
+        showMessage(
+            "decryptMessage",
+            "⚠ Please enter ciphertext.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (!password) {
+
+        showMessage(
+            "decryptMessage",
+            "⚠ Please enter the secret key.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const combined =
+            base64ToArrayBuffer(ciphertext);
+
+
+        /*
+            First 12 bytes = IV
+        */
+
+        if (combined.length < 13) {
+
+            throw new Error("Invalid ciphertext");
+        }
+
+
+        const iv =
+            combined.slice(0, 12);
+
+
+        /*
+            Remaining bytes = encrypted data
+        */
+
+        const encryptedData =
+            combined.slice(12);
+
+
+        const key =
+            await generateKey(password);
+
+
+        const decrypted =
+            await crypto.subtle.decrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                encryptedData
+            );
+
+
+        const decoder =
+            new TextDecoder();
+
+        const plainText =
+            decoder.decode(decrypted);
+
+
+        document.getElementById(
+            "decryptedText"
+        ).value = plainText;
+
+
+        /*
+            Also show result in Encrypt section.
+        */
+
+        document.getElementById(
+            "encryptText"
+        ).value = plainText;
+
+
+        showMessage(
+            "decryptMessage",
+            "✓ Decryption completed successfully.",
+            "success"
+        );
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "decryptMessage",
+            "✕ Decryption failed. Check ciphertext and secret key.",
+            "error"
+        );
+    }
+}
+
+
+
+function showMessage(id, text, type) {
+
+    const message =
+        document.getElementById(id);
+
+    message.innerText = text;
+
+    message.className =
+        "message " + type;
+}
+
+
+async function copyCiphertext() {
+
+    const ciphertext =
+        document.getElementById("cipherText").value;
+
+    if (!ciphertext) {
+
+        showMessage(
+            "encryptMessage",
+            "⚠ No ciphertext available.",
+            "error"
+        );
+
+        return;
+    }
+
+    await navigator.clipboard.writeText(ciphertext);
+
+    showMessage(
+        "encryptMessage",
+        "✓ Ciphertext copied.",
+        "success"
+    );
+}
+
+
+async function copyDecrypted() {
+
+    const text =
+        document.getElementById("decryptedText").value;
+
+    if (!text) {
+
+        showMessage(
+            "decryptMessage",
+            "⚠ No decrypted text available.",
+            "error"
+        );
+
+        return;
+    }
+
+    await navigator.clipboard.writeText(text);
+
+    showMessage(
+        "decryptMessage",
+        "✓ Plain text copied.",
+        "success"
+    );
+}
+
+
+function clearAll() {
+
+    document.getElementById(
+        "encryptText"
+    ).value = "";
+
+    document.getElementById(
+        "encryptKey"
+    ).value = "";
+
+    document.getElementById(
+        "cipherText"
+    ).value = "";
+
+    document.getElementById(
+        "decryptCipher"
+    ).value = "";
+
+    document.getElementById(
+        "decryptKey"
+    ).value = "";
+
+    document.getElementById(
+        "decryptedText"
+    ).value = "";
+
+    document.getElementById(
+        "encryptMessage"
+    ).className = "message";
+
+    document.getElementById(
+        "decryptMessage"
+    ).className = "message";
+
+}
+
+</script>
+
+</body>
+</html>
